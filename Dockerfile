@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build-env
 
 COPY ./LotoSpainAPI.csproj ./LotoSpainAPI.csproj
 COPY *.sln ./
-RUN dotnet restore
+RUN dotnet restore LotoSpainAPI.csproj
 
 COPY . ./
 RUN dotnet publish -c Release -o build -no-restore

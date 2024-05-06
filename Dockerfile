@@ -1,16 +1,15 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build-env
 
-# Copia el proyecto y restaura las dependencias
-COPY *.csproj./
+COPY ./LotoSpainAPI.csproj ./LotoSpainAPI.csproj
+COPY *.sln .
 RUN dotnet restore
 
-# Copia el resto de los archivos del proyecto
-COPY../
-RUN dotnet publish -c Release -o out
+COPY . ./
+RUN dotnet publish -c Release -o build -no-restore
 
-# Usa una imagen de runtime.NET para ejecutar la aplicación
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build-env /app/out.
-ENTRYPOINT ["dotnet", "LotoSpainAPI.dll"]
+COPY --from=build-env ./build .
+ENV ASPNETCORE_URLS=http://*:8080
+EXPOSE 8080
+ENTRYPOINT [ "dotnet", "LotoSpainAPI.dll" ]

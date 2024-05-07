@@ -1,15 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build-env
-
-COPY ./LotoSpainAPI.csproj ./LotoSpainAPI.csproj
-COPY *.sln ./
-RUN dotnet restore LotoSpainAPI.sln
+WORKDIR /app
 
 COPY . ./
-RUN dotnet publish -c Release -o build -no-restore
+RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build-env ./build .
-ENV ASPNETCORE_URLS=http://*:8080
-EXPOSE 8080
+COPY --from=build-env /app/out .
+
+ENV ASPNETCORE_ENVIRONMENT Production
+
 ENTRYPOINT [ "dotnet", "LotoSpainAPI.dll" ]
